@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeListener, View.OnClickListener, DocView.SelectionChangeListener
@@ -993,10 +995,14 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		mDocView.onDelete();
 	}
 
+	private DocPageView.NoteAnnotation lastNote = null;
+
 	public void onSelectionChanged()
 	{
 		boolean hasSel = mDocView.hasSelection();
 		boolean hasInkAnnotSel = mDocView.hasInkAnnotationSelected();
+		boolean hasAnnotSel = mDocView.hasAnnotationSelected();
+		boolean hasNoteAnnotSel = mDocView.hasNoteAnnotationSelected();
 
 		mHighlightButton.setEnabled(hasSel);
 
@@ -1008,9 +1014,36 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		mDrawButton.setSelected(drawMode);
 		mLineColorButton.setEnabled(drawMode || hasInkAnnotSel);
 		mLineThicknessButton.setEnabled(drawMode || hasInkAnnotSel);
-		mDeleteButton.setEnabled(!drawMode && hasInkAnnotSel);
+		mDeleteButton.setEnabled(!drawMode && hasAnnotSel);
 
 		findViewById(R.id.draw_tools_holder).setSelected(drawMode);
+
+		View v = findViewById(R.id.doc_note_editor);
+		mDocView.moveNoteEditor(v);
+
+		DocPageView.NoteAnnotation note = mDocView.getSelectedNoteAnnotation();
+		if (note != lastNote)
+		{
+			TextView tv = (TextView)findViewById(R.id.doc_note_editor_date);
+			EditText te = (EditText)findViewById(R.id.doc_note_editor_text);
+
+			//  save the old one
+			if (lastNote != null)
+			{
+				SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy HH:mm");
+				String date = sdf.format(new Date());
+				lastNote.setDate(date);
+				lastNote.setText(te.getText().toString());
+			}
+
+			if (note != null)
+			{
+				tv.setText(note.getDate());
+				te.setText(note.getText());
+			}
+
+			lastNote = note;
+		}
 	}
 
 	private OnDoneListener mDoneListener = null;
