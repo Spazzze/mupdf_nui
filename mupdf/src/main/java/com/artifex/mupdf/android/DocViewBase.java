@@ -197,6 +197,8 @@ public class DocViewBase
 
 	public void onOrientationChange()
 	{
+		mLastLayoutColumns = 1;
+		onScaleEnd(null);
 		triggerRender();
 	}
 
@@ -451,30 +453,33 @@ public class DocViewBase
 			Rect viewport = new Rect();
 			getGlobalVisibleRect(viewport);
 
-			//  if we're at one column and wider than the viewport,
-			//  leave it alone.
-			if (mLastLayoutColumns == 0 && mPageCollectionWidth >= viewport.width())
+			if (viewport.width()>0 && viewport.height()>0)
 			{
-				mScaling = false;
-				return;
+				//  if we're at one column and wider than the viewport,
+				//  leave it alone.
+				if (mLastLayoutColumns == 0 && mPageCollectionWidth >= viewport.width())
+				{
+					mScaling = false;
+					return;
+				}
+
+				//  ratio of the viewport width to layout width
+				float ratio = ((float) (viewport.width())) / ((float) (mPageCollectionWidth));
+
+				//  set a new scale factor
+				mScale *= ratio;
+				scaleChildren();
+
+				//  scroll horizontally so the left edge is flush with the viewport.
+				mXScroll += getScrollX();
+
+				//  scroll vertically to maintain the center.
+				int oldy = mViewport.centerY() - mLastBlockRect.top;
+				int newy = (int) ((float) oldy * ratio);
+				mYScroll -= (newy-oldy);
+
+				requestLayout();
 			}
-
-			//  ratio of the viewport width to layout width
-			float ratio = ((float) (viewport.width())) / ((float) (mPageCollectionWidth));
-
-			//  set a new scale factor
-			mScale *= ratio;
-			scaleChildren();
-
-			//  scroll horizontally so the left edge is flush with the viewport.
-			mXScroll += getScrollX();
-
-			//  scroll vertically to maintain the center.
-			int oldy = mViewport.centerY() - mLastBlockRect.top;
-			int newy = (int) ((float) oldy * ratio);
-			mYScroll -= (newy-oldy);
-
-			requestLayout();
 		}
 
 		mScaling = false;

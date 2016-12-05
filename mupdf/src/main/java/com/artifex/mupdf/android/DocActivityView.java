@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.util.AttributeSet;
@@ -44,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
 
 public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeListener, View.OnClickListener, DocView.SelectionChangeListener
 {
@@ -89,19 +89,24 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 
 	private String mEmbeddedProfile = null;
 
+	private Context mContext;
+
 	public DocActivityView(Context context)
 	{
 		super(context);
+		mContext = context;
 	}
 
 	public DocActivityView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
+		mContext = context;
 	}
 
 	public DocActivityView(Context context, AttributeSet attrs, int defStyle)
 	{
 		super(context, attrs, defStyle);
+		mContext = context;
 	}
 
 	protected boolean usePagesView()
@@ -197,14 +202,26 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 			return;
 
 		pages.setVisibility(View.VISIBLE);
-		ViewTreeObserver observer = mDocView.getViewTreeObserver();
+
+		final ViewTreeObserver observer = mDocView.getViewTreeObserver();
 		observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
 		{
 			@Override
 			public void onGlobalLayout()
 			{
-				mDocView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				observer.removeOnGlobalLayoutListener(this);
 				mDocView.onShowPages();
+			}
+		});
+
+		final ViewTreeObserver observer2 = getViewTreeObserver();
+		observer2.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+		{
+			@Override
+			public void onGlobalLayout()
+			{
+				observer2.removeOnGlobalLayoutListener(this);
+				mDocPagesView.onOrientationChange();
 			}
 		});
 	}
@@ -329,6 +346,17 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 			}
 		});
 
+		//  watch for a possible orientation change
+		ViewTreeObserver observer3 = getViewTreeObserver();
+		observer3.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+		{
+			@Override
+			public void onGlobalLayout()
+			{
+				onPossibleOrientationChange();
+			}
+		});
+
 		//  connect buttons to functions
 
 		mBackButton = (ImageButton)findViewById(R.id.back_button);
@@ -418,6 +446,33 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		else
 		{
 			afterPassword();
+		}
+	}
+
+	private static final int ORIENTATION_PORTAIT = 1;
+	private static final int ORIENTATION_LANDSCAPE = 2;
+	private int mLastOrientation = 0;
+	private void onPossibleOrientationChange()
+	{
+		//  get current orientation
+		Point p = Utilities.getRealScreenSize((Activity)mContext);
+		int orientation = ORIENTATION_PORTAIT;
+		if (p.x>p.y)
+			orientation = ORIENTATION_LANDSCAPE;
+
+		//  see if it's changed
+		if (orientation != mLastOrientation)
+			onOrientationChange();
+
+		mLastOrientation = orientation;
+	}
+
+	private void onOrientationChange()
+	{
+		mDocView.onOrientationChange();
+
+		if (usePagesView()) {
+			mDocPagesView.onOrientationChange();
 		}
 	}
 
