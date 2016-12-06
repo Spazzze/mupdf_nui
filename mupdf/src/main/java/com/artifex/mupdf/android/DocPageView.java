@@ -66,6 +66,7 @@ public class DocPageView extends View implements Callback
 	private final Paint mBorderPainter;
 	private final Rect mSrcRect = new Rect();
 	private final Rect mDstRect = new Rect();
+	private final Rect mBorderRect = new Rect();
 
 	private Rect mHighlightingRect = new Rect();
 
@@ -84,7 +85,7 @@ public class DocPageView extends View implements Callback
 	public static int bitmapMarginY = 0;
 
 	//  use this to control whether the selected border is drawn.
-	private boolean isMostVisible = false;
+	private boolean isCurrent = false;
 
 	//  currently selected TextChars
 	private ArrayList<StructuredText.TextChar> mSelection = null;
@@ -587,10 +588,11 @@ public class DocPageView extends View implements Callback
 			}
 		}
 
-		//  draw selected border
-		if (isMostVisible)
+		if (isCurrent)
 		{
-			canvas.drawRect(clipRect, mBorderPainter);
+			//  draw selected border
+			mBorderRect.set(0, 0, getChildRect().width(), getChildRect().height());
+			canvas.drawRect(mBorderRect, mBorderPainter);
 		}
 
 		canvas.restore();
@@ -831,15 +833,13 @@ public class DocPageView extends View implements Callback
 		destroyPageAndLists();
 	}
 
-	public boolean getMostVisible() {return isMostVisible;}
+	public boolean getCurrent() {return isCurrent;}
 
-	public void setMostVisible(boolean val)
+	public void setCurrent(boolean val)
 	{
-		boolean wasMostVisible = isMostVisible;
-		isMostVisible = val;
-		if (isMostVisible != wasMostVisible)
+		if (val != isCurrent)
 		{
-			//  "most visible" has changed, so redraw.
+			isCurrent = val;
 			invalidate();
 		}
 	}

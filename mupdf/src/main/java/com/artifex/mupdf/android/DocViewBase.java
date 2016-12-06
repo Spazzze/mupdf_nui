@@ -38,6 +38,7 @@ public class DocViewBase
 	private float mScale = 1.0f;
 	private int mXScroll;    // Scroll amounts recorded from events.
 	private int mYScroll;    // and then accounted for in onLayout
+	private boolean           mTouching = false;
 
 	private GestureDetector mGestureDetector;
 	private ScaleGestureDetector mScaleGestureDetector;
@@ -125,6 +126,9 @@ public class DocViewBase
 	}
 
 	protected Context mContext = null;
+
+	protected DocActivityView mHostActivity = null;
+	public void setHost(DocActivityView view) {mHostActivity = view;}
 
 	private void initialize(Context context)
 	{
@@ -488,15 +492,16 @@ public class DocViewBase
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-
 		if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_DOWN)
 		{
-			//  do something when user interaction begins
+			//  user interaction begins
+			mTouching = true;
 		}
 
 		if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP)
 		{
-			//  do something when user interaction ends
+			//  user interaction ends
+			mTouching = false;
 			triggerRender();
 		}
 
@@ -557,8 +562,13 @@ public class DocViewBase
 		int columns = (int) dcol;
 
 		//  lay them out
+
+		//  on each layout, we compute the "most visible" page.
+		//  This may be considered to be the "current" page for purposes of highlighting it
+		//  in the pages list.
 		mostVisibleChild = -1;
 		int mostVisibleChildHeight = -1;
+
 		int childTop = 0;
 		mPageCollectionHeight = 0;
 		mPageCollectionWidth = 0;
@@ -624,6 +634,8 @@ public class DocViewBase
 			}
 		}
 
+		setMostVisiblePage();
+
 		//  if the number of columns has changed, do some scrolling to adjust
 		if (mScaling && columns >= 1 && mLastLayoutColumns >= 1 && mLastLayoutColumns != columns)
 		{
@@ -648,6 +660,27 @@ public class DocViewBase
 	public int getMostVisiblePage()
 	{
 		return mostVisibleChild;
+	}
+
+	protected void setMostVisiblePage()
+	{
+		//  tell the main view about a new current page
+		//  if we're scrolling by hand.
+		//  the end of a fling is a special case.
+		if (mTouching && mostVisibleChild >= 0)
+		{
+			mHostActivity.setCurrentPage(mostVisibleChild);
+		}
+	}
+
+	protected void onEndFling()
+	{
+		//  a fling just ended.
+		//  tell the main view about a new current page
+		if ( mostVisibleChild >= 0)
+		{
+			mHostActivity.setCurrentPage(mostVisibleChild);
+		}
 	}
 
 	//  start page, get and set.
@@ -920,6 +953,8 @@ public class DocViewBase
 			long tNow = System.currentTimeMillis();
 			if (tNow != mFlingStartTime)
 				requestLayout();
+
+			onEndFling();
 		}
 	}
 

@@ -48,9 +48,27 @@ import java.util.Date;
 
 public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeListener, View.OnClickListener, DocView.SelectionChangeListener
 {
+	/*
+	This class displays a DocView, and optionally, a DocListPagesView to its right.
+	Both views show the document content, but the DocListPagesView is narrow,
+	and always shows one column.
+
+	There is logic here, and in Docview, DocViewBase and DocListPagesView,
+	to keep them both in sync, as follows:
+
+	When the DocListPagesView is showing, and the user taps on one of its pages,
+	that page is highlighted, and the DocView on the left is auto-scrolled to bring that page into view.
+	When the user scrolls the DocListPagesView, nothing more is done.
+
+	When the user scrolls the DocView on the left, a "most visible" page is determined, and the
+	DocListPagesView is auto-scrolled to bring that page into view, and that page is
+	highlighted.
+	*/
+
 	private DocView mDocView;
-	private DocReflowView mDocReflowView;
 	private DocListPagesView mDocPagesView;
+
+	private DocReflowView mDocReflowView;
 
 	private boolean mShowUI = true;
 
@@ -222,6 +240,9 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 			{
 				observer2.removeOnGlobalLayoutListener(this);
 				mDocPagesView.onOrientationChange();
+				int page = mDocView.getMostVisiblePage();
+				mDocPagesView.setCurrentPage(page);
+				mDocPagesView.scrollToPage(page);
 			}
 		});
 	}
@@ -246,6 +267,17 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 				mDocView.onHidePages();
 			}
 		});
+	}
+
+	//  called from the main DocView whenever the pages list needs to be updated.
+	public void setCurrentPage(int pageNumber)
+	{
+		if (usePagesView())
+		{
+			//  set the new current page and scroll there.
+			mDocPagesView.setCurrentPage(pageNumber);
+			mDocPagesView.scrollToPage(pageNumber);
+		}
 	}
 
 	public boolean showKeyboard()
@@ -300,6 +332,7 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 	{
 		//  main view
 		mDocView = (DocView) findViewById(R.id.doc_view_inner);
+		mDocView.setHost(this);
 		mDocReflowView = (DocReflowView) findViewById(R.id.doc_reflow_view);
 
 		//  page list
@@ -311,7 +344,7 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 				@Override
 				public void onPageSelected(int pageNumber)
 				{
-					goToPage(pageNumber);
+					mDocView.scrollToPage(pageNumber);
 				}
 			});
 
@@ -326,25 +359,6 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		View v = findViewById(R.id.doc_wrapper);
 		RelativeLayout layout = (RelativeLayout) v;
 		mDocView.setupHandles(layout);
-
-		//  listen for layout changes on the main doc view, and
-		//  copy the "most visible" value to the page list.
-		ViewTreeObserver observer2 = mDocView.getViewTreeObserver();
-		observer2.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
-		{
-			@Override
-			public void onGlobalLayout()
-			{
-				if (usePagesView())
-				{
-					if (mDocView.getVisibility() == View.VISIBLE)
-					{
-						int mvp = mDocView.getMostVisiblePage();
-						mDocPagesView.setMostVisiblePage(mvp);
-					}
-				}
-			}
-		});
 
 		//  watch for a possible orientation change
 		ViewTreeObserver observer3 = getViewTreeObserver();
@@ -703,7 +717,7 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		if (mDocReflowView.getVisibility() == View.VISIBLE)
 		{
 			setReflowText(pageNumber);
-			mDocPagesView.setMostVisiblePage(pageNumber);
+			mDocPagesView.setCurrentPage(pageNumber);
 		}
 	}
 
