@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.os.Build;
 import android.util.DisplayMetrics;
@@ -430,5 +431,12 @@ public class Utilities
 		}
 
 		return new Point(realWidth, realHeight);
+	}
+
+	public static int convertDpToPixel(float dp)
+	{
+		DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+		float px = dp * (metrics.densityDpi / 160f);
+		return (int)Math.round(px);
 	}
 }

@@ -44,6 +44,6 @@
     <!-- text highlighting -->
     <color name="text_highlight_color">#66CCFF</color>
 
-    <color name="blue_dot_color">#0080FF</color>
+    <color name="selected_page_border_color">#ffaa00</color>
 
 </resources>

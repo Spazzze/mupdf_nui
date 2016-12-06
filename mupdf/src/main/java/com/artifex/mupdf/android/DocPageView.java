@@ -63,7 +63,7 @@ public class DocPageView extends View implements Callback
 	private final Paint mSelectionHighlightPainter;
 	private final Paint mSearchHighlightPainter;
 	private final Paint mBlankPainter;
-	private final Paint mDotPainter;
+	private final Paint mBorderPainter;
 	private final Rect mSrcRect = new Rect();
 	private final Rect mDstRect = new Rect();
 
@@ -83,7 +83,7 @@ public class DocPageView extends View implements Callback
 	public static int bitmapMarginX = 0;
 	public static int bitmapMarginY = 0;
 
-	//  use this to control whether the blue dot is drawn in the upper left corner.
+	//  use this to control whether the selected border is drawn.
 	private boolean isMostVisible = false;
 
 	//  currently selected TextChars
@@ -114,9 +114,10 @@ public class DocPageView extends View implements Callback
 		mBlankPainter.setStyle(Paint.Style.FILL);
 		mBlankPainter.setColor(Color.WHITE);
 
-		mDotPainter = new Paint();
-		mDotPainter.setStyle(Paint.Style.FILL);
-		mDotPainter.setColor(ContextCompat.getColor(context, R.color.blue_dot_color));
+		mBorderPainter = new Paint();
+		mBorderPainter.setColor(ContextCompat.getColor(context, R.color.selected_page_border_color));
+		mBorderPainter.setStyle(Paint.Style.STROKE);
+		mBorderPainter.setStrokeWidth(Utilities.convertDpToPixel(context.getResources().getInteger(R.integer.selected_page_border_width)));
 
 		setFocusable(true);
 		setFocusableInTouchMode(true);
@@ -586,10 +587,10 @@ public class DocPageView extends View implements Callback
 			}
 		}
 
-		//  draw blue dot
+		//  draw selected border
 		if (isMostVisible)
 		{
-			canvas.drawCircle(30, 30, 15, mDotPainter);
+			canvas.drawRect(clipRect, mBorderPainter);
 		}
 
 		canvas.restore();

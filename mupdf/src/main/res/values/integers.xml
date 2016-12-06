@@ -11,4 +11,6 @@
 
     <item name="selection_dot_scale" format="float" type="dimen">0.80</item>
 
+    <integer name="selected_page_border_width">15</integer>
+
 </resources>
