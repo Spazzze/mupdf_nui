@@ -107,6 +107,11 @@ public class DocViewBase
 	private int mostVisibleChild = -1;
 	private final Rect mostVisibleRect = new Rect();
 
+	//  use these to reduce unnecessary layout calls.
+	private float mLastScale = 0;
+	private int mLastScrollX = 0;
+	private int mLastScrollY = 0;
+
 	public DocViewBase(Context context)
 	{
 		super(context);
@@ -530,15 +535,22 @@ public class DocViewBase
 		if (getPageCount() == 0)
 			return;
 
-		int numDocPages = getPageCount();
-
 		//  not if we've been finished
 		if (finished())
 			return;
 
+		int numDocPages = getPageCount();
+
 		//  perform any pending scrolling
 		scrollBy(-mXScroll, -mYScroll);
 		mXScroll = mYScroll = 0;
+
+		//  do we really need to layout again?
+		if (mScale==mLastScale && mLastScrollX==getScrollX() && mLastScrollY==getScrollY())
+			return;
+		mLastScale = mScale;
+		mLastScrollX = getScrollX();
+		mLastScrollY = getScrollY();
 
 		//  get current viewport
 		mViewportOrigin.set(getScrollX(), getScrollY());
