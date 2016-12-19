@@ -184,14 +184,24 @@ public class DocPageView extends View implements Callback
 		mScale = scale;
 	}
 
+	public int getUnscaledWidth() {return mSize.x;}
+	public int getScaledWidth()
+	{
+		return (int)(getUnscaledWidth() * mScale);
+	}
 	public int getCalculatedWidth()
 	{
-		return (int) (mSize.x * mScale);
+		return (int)(getUnscaledWidth() * mScale);
 	}
 
+	public int getUnscaledHeight() {return mSize.y;}
+	public int getScaledHeight()
+	{
+		return (int)(getUnscaledHeight() * mScale);
+	}
 	public int getCalculatedHeight()
 	{
-		return (int) (mSize.y * mScale);
+		return (int)(getUnscaledHeight() * mScale);
 	}
 
 	//  a test for real visibility
@@ -281,7 +291,7 @@ public class DocPageView extends View implements Callback
 		//  make a rect representing the entire page; this might be outside the bounds of the bitmap
 		int[] locations = new int[2];
 		getLocationOnScreen(locations);
-		Rect pageRect = new Rect(locations[0], locations[1], locations[0] + getCalculatedWidth(), locations[1] + getCalculatedHeight());
+		Rect pageRect = new Rect(locations[0], locations[1], locations[0] + getScaledWidth(), locations[1] + getScaledHeight());
 
 		//  Set rects for rendering and display
 		mPatchRect.set(globalVisRect);

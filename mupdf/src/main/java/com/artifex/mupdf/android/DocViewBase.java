@@ -24,7 +24,7 @@ public class DocViewBase
 		extends AdapterView<Adapter>
 		implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener, Runnable
 {
-	private static final int GAP = 20;
+	private static final int UNSCALED_GAP = 20;
 
 	private static final float MIN_SCALE = .15f;
 	private static final float MAX_SCALE = 5.0f;
@@ -300,10 +300,10 @@ public class DocViewBase
 			//  add in the margin
 			if (includeMargin)
 			{
-				childRect.left -= GAP / 2;
-				childRect.right += GAP / 2;
-				childRect.top -= GAP / 2;
-				childRect.bottom += GAP / 2;
+				childRect.left   -= UNSCALED_GAP*mScale/2;
+				childRect.right  += UNSCALED_GAP*mScale/2;
+				childRect.top    -= UNSCALED_GAP*mScale/2;
+				childRect.bottom += UNSCALED_GAP*mScale/2;
 			}
 
 			//  see if the rect contains the point
@@ -557,20 +557,20 @@ public class DocViewBase
 		getGlobalVisibleRect(mViewport);
 		mViewport.offsetTo(mViewportOrigin.x, mViewportOrigin.y);
 
-		//  find the widest child
-		int maxw = 0;
-		int numPages = getPageCount();
-		for (int i = 0; i < numPages; i++)
+		//  find the widest and tallest page
+		int unscaledMaxw = 0;
+		int unscaledMaxh = 0;
+		for (int i=0; i<getPageCount(); i++)
 		{
-			DocPageView cv = (DocPageView) getOrCreateChild(i);
-
-			int childWidth = cv.getCalculatedWidth();
-			if (childWidth > maxw)
-				maxw = childWidth;
+			DocPageView page = (DocPageView)getOrCreateChild(i);
+			unscaledMaxw = Math.max(unscaledMaxw, page.getUnscaledWidth());
+			unscaledMaxh = Math.max(unscaledMaxh, page.getUnscaledHeight());
 		}
+		int maxw = (int)(unscaledMaxw*mScale);
 
 		//  how many columns?
-		double dcol = (double) (mViewport.width() + GAP) / (double) (maxw + GAP);
+		int scaledGap = (int)(UNSCALED_GAP*mScale);
+		double dcol = (double)(mViewport.width()+scaledGap)/(double)(maxw+scaledGap);
 		int columns = (int) dcol;
 
 		//  lay them out
@@ -581,31 +581,43 @@ public class DocViewBase
 		mostVisibleChild = -1;
 		int mostVisibleChildHeight = -1;
 
-		int childTop = 0;
 		mPageCollectionHeight = 0;
 		mPageCollectionWidth = 0;
-		int column = 0;
 		mBlockRect.setEmpty();
+
+		int column = 0;
+		int childTop = 0;
+		int childWidth, childHeight, childLeft, childRight, childBottom;
 
 		for (int i = 0; i < numDocPages; i++)
 		{
 			DocPageView cv = (DocPageView) getOrCreateChild(i);
-			int childWidth = cv.getCalculatedWidth();
-			int childHeight = cv.getCalculatedHeight();
-			int childLeft = column * (maxw + GAP);
-			int childRight = childLeft + childWidth;
-			int childBottom = childTop + childHeight;
-			mChildRect.set(childLeft, childTop, childRight, childBottom);
+
+			//  calculate the page dimensions using integer math.
+			//  this actually produces the same result each time, since the page size is fixed.
+
+			childWidth = cv.getUnscaledWidth();
+			childHeight = cv.getUnscaledHeight();
+			childLeft = column * (unscaledMaxw + UNSCALED_GAP);
+			childRight = childLeft + childWidth;
+			childBottom = childTop + childHeight;
+
+			//  scale those results to get the actual page location.
+			int scaledChildLeft   = (int)(childLeft  *mScale);
+			int scaledChildTop    = (int)(childTop   *mScale);
+			int scaledChildRight  = (int)(childRight *mScale);
+			int scaledChildBottom = (int)(childBottom*mScale);
 
 			//  stash the rect in the page view for later use.
+			mChildRect.set(scaledChildLeft, scaledChildTop, scaledChildRight, scaledChildBottom);
 			cv.setChildRect(mChildRect);
 
 			//  at each layout, we remember the entire width and height of the laid-out
 			//  pages.  This is used in applying constraints to scrolling amounts.
-			if (childBottom > mPageCollectionHeight)
-				mPageCollectionHeight = childBottom;
-			if (childRight > mPageCollectionWidth)
-				mPageCollectionWidth = childRight;
+			if (scaledChildBottom > mPageCollectionHeight)
+				mPageCollectionHeight = scaledChildBottom;
+			if (scaledChildRight > mPageCollectionWidth)
+				mPageCollectionWidth = scaledChildRight;
 
 			if (mBlockRect.isEmpty())
 				mBlockRect.set(mChildRect);
@@ -617,7 +629,7 @@ public class DocViewBase
 				//  visible, so include in layout
 				if (cv.getParent() == null)
 					addChildToLayout(cv);
-				cv.layout(childLeft, childTop, childRight, childBottom);
+				cv.layout(scaledChildLeft, scaledChildTop, scaledChildRight, scaledChildBottom);
 				cv.invalidate();
 
 				//  determine the "most visible" child.
@@ -641,8 +653,8 @@ public class DocViewBase
 			if (column >= columns)
 			{
 				column = 0;
-				childTop += childHeight;
-				childTop += GAP;
+				childTop += unscaledMaxh;
+				childTop += UNSCALED_GAP;
 			}
 		}
 
