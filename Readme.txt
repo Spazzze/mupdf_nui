@@ -1,21 +1,23 @@
-mupdf/platform/android/example - build instructions
+This is the project for the example MuPDF Android viewer.
 
-1.  get the code and submodules
+The old example viewer had its own JNI layer. This is the new example viewer
+that uses the official MuPDF JNI bindings.
 
-2.  make generate
+LICENSE
 
-3.  cd mupdf/platform/android/viewer
+MuPDF is Copyright 2006-2016 Artifex Software, Inc.
 
-3.  build:   ndk-build
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
 
-4.  copy the resulting .so file:
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-	mkdir -p ../example/mupdf/libs/armeabi-v7a
-	rm -f ../example/mupdf/libs/armeabi-v7a/libmupdf_java32.so
-	cp ./libs/armeabi-v7a/libmupdf_java.so ../example/mupdf/libs/armeabi-v7a/
+You should have received a copy of the GNU Affero General Public License along
+with this program. If not, see <http://www.gnu.org/licenses/>.
 
-5.  Open the example in Android Studio
-
-6.  build and run
-
-If you modify C code, do steps 3, 4 and 6 as needed
+For commercial licensing, including our "Indie Dev" friendly options,
+please contact sales@artifex.com.
