@@ -693,7 +693,7 @@ public class DocViewBase
 		super.scrollBy(p.x, p.y);
 	}
 
-	// apply contraints to every scroll request.
+	// apply constraints to every scroll request.
 
 	protected Point constrainScrollBy(int dx, int dy)
 	{
@@ -789,7 +789,7 @@ public class DocViewBase
 		if (v == null)
 		{
 			v = getViewFromAdapter(i);
-			mChildViews.append(i, v); // Record the view against it's adapter index
+			mChildViews.append(i, v); // Record the view against its adapter index
 			onScaleChild(v, mScale);
 		}
 

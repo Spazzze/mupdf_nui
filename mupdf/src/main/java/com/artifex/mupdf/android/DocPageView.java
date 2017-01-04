@@ -436,11 +436,11 @@ public class DocPageView extends View implements Callback
 		return new Point((int)tchar.bbox.x1, (int)tchar.bbox.y1);
 	}
 
-	//  Find the collection ot TextChars belonging to lines
+	//  Find the collection of TextChars belonging to lines
 	//  that intersect the rectangle define by two points.
 	//  For the first line, include those to the right of upperLeft.x
 	//  For the last line, include those to the left of lowerLeft.x
-	//  ASSUMPTION: this algorith does not handle right-to-left languages.
+	//  ASSUMPTION: this algorithm does not handle right-to-left languages.
 
 	public void setSelection(Point upperLeft, Point lowerLeft)
 	{
