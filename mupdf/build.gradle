@@ -22,13 +22,18 @@ android {
 		main {
 			java {
 				//  we're getting java sources from two places
-				srcDirs = ["src/main/java", "../../../java/src"]
+				srcDirs = ["src/main/java", "../libmupdf/platform/java/src"]
 			}
 			jni.srcDirs = [] // This prevents the auto generation of Android.mk
 			jniLibs.srcDir 'libs'  //  where to find the .so file(s)
 		}
 	}
 
+	externalNativeBuild {
+		ndkBuild {
+			path '../libmupdf/platform/java/Android.mk'
+		}
+	}
 }
 
 dependencies {
