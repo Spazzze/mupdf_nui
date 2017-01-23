@@ -9,6 +9,17 @@ android {
 		targetSdkVersion 16
 		versionCode 1
 		versionName "1.0"
+
+		ndk {
+			// Allow for users to create a gradle.properties file
+			// in the top-level directory listing desired ABIs like so
+			//
+			// APP_ABI=armeabi-v7a,x86
+			if (project.hasProperty('APP_ABI')) {
+				abiFilters = []
+				abiFilters.addAll(APP_ABI.split(',').collect{it as String})
+			}
+		}
 	}
 
 	buildTypes {
