@@ -2,16 +2,38 @@ package com.artifex.mupdf.android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.pdf.PdfDocument;
+import android.os.AsyncTask;
+import android.os.CancellationSignal;
+import android.os.Handler;
+import android.os.Looper;
+import android.print.PageRange;
+import android.print.pdf.PrintedPdfDocument;
+import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.artifex.mupdf.fitz.Document;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+
 public class PageAdapter extends BaseAdapter
 {
 	private final Context mContext;
 	private Document mDoc;
+	private volatile int loadedPageCount = 0;
 
 	public PageAdapter(Context c)
 	{
@@ -21,10 +43,35 @@ public class PageAdapter extends BaseAdapter
 	public void setDocument(Document doc)
 	{
 		mDoc = doc;
+		final int realPageCount = mDoc.countPages();
+		loadedPageCount = 0;
+
+		//  load the first page
+		mDoc.loadPage(loadedPageCount);
+		loadedPageCount++;
+
+		if (realPageCount>1)
+		{
+			// load the rest
+			final Handler handler = new Handler(Looper.getMainLooper());
+			handler.post(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					//  load a page
+					mDoc.loadPage(loadedPageCount);
+					loadedPageCount++;
+
+					//  delay loading of the next page a little, to keep the UI responsive.
+					if (loadedPageCount<realPageCount)
+						handler.postDelayed(this, 2);
+				}
+			});
+		}
 	}
 
 	private int mWidth;
-
 	public void setWidth(int w)
 	{
 		mWidth = w;
@@ -33,7 +80,8 @@ public class PageAdapter extends BaseAdapter
 	@Override
 	public int getCount()
 	{
-		return mDoc.countPages();
+		//  return the number of pages that have been loaded so far.
+		return loadedPageCount;
 	}
 
 	public Object getItem(int position)

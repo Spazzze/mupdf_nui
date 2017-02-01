@@ -154,7 +154,7 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 	@Override
 	public void onClick(View v)
 	{
-		int pageCount = mDocView.getDoc().countPages();  //  the real page count
+		int pageCount = mDocView.getAdapter().getCount();
 		int currentPage = mDocView.getCurrentPage();
 
 		if (v == mFirstPageButton)
@@ -251,7 +251,7 @@ public class ProofActivity extends Activity implements View.OnClickListener, Doc
 	private void setPageLabel()
 	{
 		int page = mDocView.getCurrentPage()+1;
-		int count = mDocView.getDoc().countPages();
+		int count = mDocView.getAdapter().getCount();
 		String s = String.format("Page %d of %d", page, count);
 		TextView tv = (TextView) findViewById(R.id.proof_page_n_of_n);
 		tv.setText(s);
