@@ -112,6 +112,12 @@ public class DocViewBase
 	private int mLastScrollX = 0;
 	private int mLastScrollY = 0;
 
+	//  widest page width (unscaled)
+	private int unscaledMaxw = 0;
+
+	//  tallest page height (unscaled)
+	private int unscaledMaxh = 0;
+
 	public DocViewBase(Context context)
 	{
 		super(context);
@@ -475,8 +481,9 @@ public class DocViewBase
 				//  ratio of the viewport width to layout width
 				float ratio = ((float) (viewport.width())) / ((float) (mPageCollectionWidth));
 
-				//  set a new scale factor
-				mScale *= ratio;
+				//  set a new scale factor that will result in the same number of columns
+				int unscaledTotal = unscaledMaxw*mLastLayoutColumns + UNSCALED_GAP*(mLastLayoutColumns-1);
+				mScale = (float)viewport.width()/(float)unscaledTotal;
 				scaleChildren();
 
 				//  scroll horizontally so the left edge is flush with the viewport.
@@ -558,8 +565,8 @@ public class DocViewBase
 		mViewport.offsetTo(mViewportOrigin.x, mViewportOrigin.y);
 
 		//  find the widest and tallest page
-		int unscaledMaxw = 0;
-		int unscaledMaxh = 0;
+		unscaledMaxw = 0;
+		unscaledMaxh = 0;
 		for (int i=0; i<getPageCount(); i++)
 		{
 			DocPageView page = (DocPageView)getOrCreateChild(i);
