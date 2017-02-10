@@ -336,6 +336,14 @@ public class DocPageView extends View implements Callback
 		int patchX1 = mPatchRect.right;
 		int patchY1 = mPatchRect.bottom;
 
+		//  the patch should be a subset of the page.  If not, bail.
+		//  this happens when rotating the device.
+		if (patchX0>=pageX1 || patchX1<=pageX0 || patchY0>=pageY1 || patchY1<=pageY0)
+		{
+			listener.progress(0);
+			return;
+		}
+
 		//  set up a matrix for scaling
 		Matrix ctm = Matrix.Identity();
 		ctm.scale((float) getFactor());
