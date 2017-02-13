@@ -143,6 +143,10 @@ public class DocViewBase
 
 	private void initialize(Context context)
 	{
+		//  set the view background color
+		int bgColor = context.getResources().getColor(R.color.doc_background);
+		setBackgroundColor(bgColor);
+
 		mContext = context;
 		mGestureDetector = new GestureDetector(context, this);
 		mScaleGestureDetector = new ScaleGestureDetector(context, this);
