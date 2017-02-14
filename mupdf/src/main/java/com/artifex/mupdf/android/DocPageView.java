@@ -44,6 +44,8 @@ public class DocPageView extends View implements Callback
 
 	private float mScale = 1.0f;
 	private float mZoom = 1.0f;
+	private int setupW;
+	private int setupH;
 
 	//  rendering
 	private Bitmap mRenderBitmap = null;
@@ -126,27 +128,58 @@ public class DocPageView extends View implements Callback
 
 	public void setupPage(final int thePageNum, int w, int h)
 	{
-		//  if the page number has not yet been set, or has changed,
-		//  make a new page object.
 		if (thePageNum != mPageNum)
 		{
+			//  the page number has not yet been set, or has changed
+
 			//  destroy current page and lists
 			destroyPageAndLists();
 
-			//  switch to the new page
+			//  switch to the new page number
 			mPageNum = thePageNum;
-			mPage = mDoc.loadPage(mPageNum);
+
+			//  remember the inputs
+			setupW = w;
+			setupH = h;
+
+			//  we defer the actual loading of the page until it's needed,
+			//  at render time.
 		}
 
 		//  calculate zoom that makes page fit
+		sizePage(w, h);
+	}
 
-		com.artifex.mupdf.fitz.Rect pageBounds = mPage.getBounds();
+	private void loadPage()
+	{
+		if (mPage == null)
+		{
+			//  load and size the page
+			mPage = mDoc.loadPage(mPageNum);
+			sizePage(setupW, setupH);
+		}
+	}
 
-		float pagew = (pageBounds.x1 - pageBounds.x0) * mResolution / 72f;
-		float pageH = (pageBounds.y1 - pageBounds.y0) * mResolution / 72f;
+	private void sizePage(int w, int h)
+	{
+		float pagew, pageh;
+		if (mPage != null)
+		{
+			//  page exists, use it's actual size
+			com.artifex.mupdf.fitz.Rect pageBounds = mPage.getBounds();
+			pagew = (pageBounds.x1 - pageBounds.x0) * mResolution / 72f;
+			pageh = (pageBounds.y1 - pageBounds.y0) * mResolution / 72f;
+		}
+		else
+		{
+			//  page does not yet exist.  Give it a default size.
+			//  this will be recalculated when the page is loaded later
+			pagew = 8.5f * mResolution;
+			pageh = 11f * mResolution;
+		}
 
 		mZoom = w / pagew;
-		mSize = new Point((int) (pagew * mZoom), (int) (pageH * mZoom));
+		mSize = new Point((int) (pagew * mZoom), (int) (pageh * mZoom));
 	}
 
 	private void destroyPageAndLists()
@@ -171,6 +204,7 @@ public class DocPageView extends View implements Callback
 
 	public Page getPage()
 	{
+		loadPage();
 		return mPage;
 	}
 
@@ -189,17 +223,9 @@ public class DocPageView extends View implements Callback
 	{
 		return (int)(getUnscaledWidth() * mScale);
 	}
-	public int getCalculatedWidth()
-	{
-		return (int)(getUnscaledWidth() * mScale);
-	}
 
 	public int getUnscaledHeight() {return mSize.y;}
 	public int getScaledHeight()
-	{
-		return (int)(getUnscaledHeight() * mScale);
-	}
-	public int getCalculatedHeight()
 	{
 		return (int)(getUnscaledHeight() * mScale);
 	}
@@ -280,6 +306,7 @@ public class DocPageView extends View implements Callback
 			renderNoPage(bitmap, listener, localVisRect, globalVisRect);
 		else
 		{
+			loadPage();
 			cachePage();
 			renderPage(bitmap, listener, localVisRect, globalVisRect, showAnnotations);
 		}

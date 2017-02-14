@@ -107,11 +107,6 @@ public class DocViewBase
 	private int mostVisibleChild = -1;
 	private final Rect mostVisibleRect = new Rect();
 
-	//  use these to reduce unnecessary layout calls.
-	private float mLastScale = 0;
-	private int mLastScrollX = 0;
-	private int mLastScrollY = 0;
-
 	//  widest page width (unscaled)
 	private int unscaledMaxw = 0;
 
@@ -539,6 +534,7 @@ public class DocViewBase
 	{
 		super.onLayout(changed, left, top, right, bottom);
 
+		//  not if we haven't been started
 		if (!mStarted)
 			return;
 
@@ -556,13 +552,6 @@ public class DocViewBase
 		scrollBy(-mXScroll, -mYScroll);
 		mXScroll = mYScroll = 0;
 
-		//  do we really need to layout again?
-		if (mScale==mLastScale && mLastScrollX==getScrollX() && mLastScrollY==getScrollY())
-			return;
-		mLastScale = mScale;
-		mLastScrollX = getScrollX();
-		mLastScrollY = getScrollY();
-
 		//  get current viewport
 		mViewportOrigin.set(getScrollX(), getScrollY());
 		getGlobalVisibleRect(mViewport);
@@ -573,9 +562,9 @@ public class DocViewBase
 		unscaledMaxh = 0;
 		for (int i=0; i<getPageCount(); i++)
 		{
-			DocPageView page = (DocPageView)getOrCreateChild(i);
-			unscaledMaxw = Math.max(unscaledMaxw, page.getUnscaledWidth());
-			unscaledMaxh = Math.max(unscaledMaxh, page.getUnscaledHeight());
+			DocPageView pageView = (DocPageView)getOrCreateChild(i);
+			unscaledMaxw = Math.max(unscaledMaxw, pageView.getUnscaledWidth());
+			unscaledMaxh = Math.max(unscaledMaxh, pageView.getUnscaledHeight());
 		}
 		int maxw = (int)(unscaledMaxw*mScale);
 
@@ -599,6 +588,7 @@ public class DocViewBase
 		int column = 0;
 		int childTop = 0;
 		int childWidth, childHeight, childLeft, childRight, childBottom;
+		int rowh = 0;
 
 		for (int i = 0; i < numDocPages; i++)
 		{
@@ -660,12 +650,18 @@ public class DocViewBase
 				removeViewInLayout(cv);
 			}
 
+			//  height of the current row is the largest height of a child in that row
+			if (childHeight>rowh)
+				rowh = childHeight;
+
 			column++;
 			if (column >= columns)
 			{
 				column = 0;
-				childTop += unscaledMaxh;
+				childTop += rowh;
 				childTop += UNSCALED_GAP;
+				//  reset the row height
+				rowh = 0;
 			}
 		}
 
