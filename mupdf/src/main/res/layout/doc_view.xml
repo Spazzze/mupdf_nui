@@ -192,7 +192,7 @@
                         android:textSize="20sp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="muPDF Mobile" />
+                        android:text="@string/note_title" />
 
                     <TextView
                         android:background="@color/transparent"
@@ -201,7 +201,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
                         android:id="@+id/doc_note_editor_date"
-                        android:text="1/1/2016 12:00" />
+                        android:text="@string/note_date" />
 
                     <EditText
                         android:textColor="@color/black"

@@ -38,7 +38,7 @@
                     android:gravity="center"
                     android:textColor="@color/black"
                     android:textSize="11sp"
-                    android:text="FIRST PAGE"/>
+                    android:text="@string/first_page_button"/>
             </LinearLayout>
 
 
@@ -65,7 +65,7 @@
                     android:gravity="center"
                     android:textColor="@color/black"
                     android:textSize="11sp"
-                    android:text="LAST PAGE"/>
+                    android:text="@string/last_page_button"/>
             </LinearLayout>
 
 
@@ -100,7 +100,7 @@
                     android:gravity="center"
                     android:textColor="@color/black"
                     android:textSize="11sp"
-                    android:text="REFLOW"/>
+                    android:text="@string/reflow_button"/>
             </LinearLayout>
 
         </LinearLayout>

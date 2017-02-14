@@ -76,7 +76,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:textSize="11sp"
-                    android:text="@string/next_upper"/>
+                    android:text="@string/find_next"/>
             </LinearLayout>
 
             <LinearLayout
@@ -101,7 +101,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
                     android:textSize="11sp"
-                    android:text="@string/previous_upper"/>
+                    android:text="@string/find_previous"/>
             </LinearLayout>
 
         </LinearLayout>
