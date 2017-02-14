@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -78,32 +80,32 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 	private String mTagAnnotate;
 	private String mTagPages;
 
-	private ImageButton mReflowButton;
-	private ImageButton mFirstPageButton;
-	private ImageButton mLastPageButton;
+	private Button mReflowButton;
+	private Button mFirstPageButton;
+	private Button mLastPageButton;
 
 	private ImageButton mSearchButton;
 	private EditText mSearchText;
-	private ImageButton mSearchNextButton;
-	private ImageButton mSearchPreviousButton;
+	private Button mSearchNextButton;
+	private Button mSearchPreviousButton;
 	private ImageButton mBackButton;
 
-	private ImageButton mSaveButton;
-	private ImageButton mSaveAsButton;
-	private ImageButton mPrintButton;
-	private ImageButton mShareButton;
-	private ImageButton mOpenInButton;
+	private Button mSaveButton;
+	private Button mSaveAsButton;
+	private Button mPrintButton;
+	private Button mShareButton;
+	private Button mOpenInButton;
 
-	private ImageButton mToggleAnnotButton;
-	private ImageButton mHighlightButton;
-	private ImageButton mDeleteButton;
+	private Button mToggleAnnotButton;
+	private Button mHighlightButton;
+	private Button mDeleteButton;
 
-	private ImageButton mNoteButton;
-	private ImageButton mDrawButton;
-	private ImageButton mLineColorButton;
-	private ImageButton mLineThicknessButton;
+	private Button mNoteButton;
+	private Button mDrawButton;
+	private Button mLineColorButton;
+	private Button mLineThicknessButton;
 
-	private ImageButton mProofButton;
+	private Button mProofButton;
 
 	private String mEmbeddedProfile = null;
 
@@ -376,13 +378,13 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		mBackButton = (ImageButton)findViewById(R.id.back_button);
 		mBackButton.setOnClickListener(this);
 
-		mReflowButton = (ImageButton)findViewById(R.id.reflow_button);
+		mReflowButton = (Button)findViewById(R.id.reflow_button);
 		mReflowButton.setOnClickListener(this);
 
-		mFirstPageButton = (ImageButton)findViewById(R.id.first_page_button);
+		mFirstPageButton = (Button)findViewById(R.id.first_page_button);
 		mFirstPageButton.setOnClickListener(this);
 
-		mLastPageButton = (ImageButton)findViewById(R.id.last_page_button);
+		mLastPageButton = (Button)findViewById(R.id.last_page_button);
 		mLastPageButton.setOnClickListener(this);
 
 		mSearchButton = (ImageButton)findViewById(R.id.search_button);
@@ -391,22 +393,22 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 		mSearchText = (EditText) findViewById(R.id.search_text_input);
 		mSearchText.setOnClickListener(this);
 
-		mSaveButton = (ImageButton)findViewById(R.id.save_button);
+		mSaveButton = (Button)findViewById(R.id.save_button);
 		mSaveButton.setOnClickListener(this);
 
-		mSaveAsButton = (ImageButton)findViewById(R.id.save_as_button);
+		mSaveAsButton = (Button)findViewById(R.id.save_as_button);
 		mSaveAsButton.setOnClickListener(this);
 
-		mPrintButton = (ImageButton)findViewById(R.id.print_button);
+		mPrintButton = (Button)findViewById(R.id.print_button);
 		mPrintButton.setOnClickListener(this);
 
-		mShareButton = (ImageButton)findViewById(R.id.share_button);
+		mShareButton = (Button)findViewById(R.id.share_button);
 		mShareButton.setOnClickListener(this);
 
-		mOpenInButton = (ImageButton)findViewById(R.id.open_in_button);
+		mOpenInButton = (Button)findViewById(R.id.open_in_button);
 		mOpenInButton.setOnClickListener(this);
 
-		mProofButton = (ImageButton)findViewById(R.id.proof_button);
+		mProofButton = (Button)findViewById(R.id.proof_button);
 		mProofButton.setOnClickListener(this);
 
 		//  this listener will
@@ -424,31 +426,31 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 			}
 		});
 
-		mSearchNextButton = (ImageButton)findViewById(R.id.search_next_button);
+		mSearchNextButton = (Button)findViewById(R.id.search_next_button);
 		mSearchNextButton.setOnClickListener(this);
 
-		mSearchPreviousButton = (ImageButton)findViewById(R.id.search_previous_button);
+		mSearchPreviousButton = (Button)findViewById(R.id.search_previous_button);
 		mSearchPreviousButton.setOnClickListener(this);
 
-		mToggleAnnotButton = (ImageButton)findViewById(R.id.show_annot_button);
+		mToggleAnnotButton = (Button)findViewById(R.id.show_annot_button);
 		mToggleAnnotButton.setOnClickListener(this);
 
-		mHighlightButton = (ImageButton)findViewById(R.id.highlight_button);
+		mHighlightButton = (Button)findViewById(R.id.highlight_button);
 		mHighlightButton.setOnClickListener(this);
 
-		mNoteButton = (ImageButton)findViewById(R.id.note_button);
+		mNoteButton = (Button)findViewById(R.id.note_button);
 		mNoteButton.setOnClickListener(this);
 
-		mDrawButton = (ImageButton)findViewById(R.id.draw_button);
+		mDrawButton = (Button)findViewById(R.id.draw_button);
 		mDrawButton.setOnClickListener(this);
 
-		mLineColorButton = (ImageButton)findViewById(R.id.line_color_button);
+		mLineColorButton = (Button)findViewById(R.id.line_color_button);
 		mLineColorButton.setOnClickListener(this);
 
-		mLineThicknessButton = (ImageButton)findViewById(R.id.line_thickness_button);
+		mLineThicknessButton = (Button)findViewById(R.id.line_thickness_button);
 		mLineThicknessButton.setOnClickListener(this);
 
-		mDeleteButton = (ImageButton)findViewById(R.id.delete_button);
+		mDeleteButton = (Button)findViewById(R.id.delete_button);
 		mDeleteButton.setOnClickListener(this);
 
 		mDoc = new Document(path);
@@ -820,7 +822,8 @@ public class DocActivityView extends FrameLayout implements TabHost.OnTabChangeL
 				{
 					int icolor = Color.parseColor(color);
 					mDocView.setInkLineColor(icolor);
-					mLineColorButton.setColorFilter(icolor, PorterDuff.Mode.SRC_IN);
+					Drawable drawables[] = mLineColorButton.getCompoundDrawables();
+					drawables[1].setColorFilter(icolor, PorterDuff.Mode.SRC_IN);
 				}
 			}, true);
 			dlg.setShowTitle(false);
