@@ -10,7 +10,7 @@ android {
 		versionCode 1
 		versionName "1.0"
 
-		ndk {
+/*		ndk {
 			// Allow for users to create a gradle.properties file
 			// in the top-level directory listing desired ABIs like so
 			//
@@ -19,7 +19,7 @@ android {
 				abiFilters = []
 				abiFilters.addAll(APP_ABI.split(',').collect{it as String})
 			}
-		}
+		}*/
 	}
 
 	buildTypes {
@@ -39,12 +39,12 @@ android {
 			jniLibs.srcDir 'libs'  //  where to find the .so file(s)
 		}
 	}
-
+/*
 	externalNativeBuild {
 		ndkBuild {
 			path '../libmupdf/platform/java/Android.mk'
 		}
-	}
+	}*/
 }
 
 dependencies {
